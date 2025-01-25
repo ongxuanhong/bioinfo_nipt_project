@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Airflow services
+  airflow-webserver:
+    image: apache/airflow:2.7.1
+    command: webserver
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__WEBSERVER__SECRET_KEY=your_secret_key
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./plugins:/opt/airflow/plugins
+      - workflow_data:/workflow_data
+    depends_on:
+      - airflow-db
+    networks:
+      - nipt-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1
+    command: scheduler
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./plugins:/opt/airflow/plugins
+      - workflow_data:/workflow_data
+    depends_on:
+      - airflow-webserver
+    networks:
+      - nipt-network
+
+  airflow-db:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - airflow_db_data:/var/lib/postgresql/data
+    networks:
+      - nipt-network
+
+volumes:
+  airflow_db_data:
+  workflow_data:
+
+networks:
+  nipt-network:
+    driver: bridge
