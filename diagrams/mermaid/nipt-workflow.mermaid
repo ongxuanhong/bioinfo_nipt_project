@@ -1,0 +1,29 @@
+sequenceDiagram
+    actor Doctor
+    actor Bioinformatician
+    participant Django Web App
+    participant Airflow
+    participant Nextflow
+    participant Database
+    participant Storage (S3)
+
+    Doctor->>Django Web App: Uploads BAM/FASTQ file (Patient Dashboard)
+    Django Web App->>Database: Saves sample metadata (status: Pending)
+    Django Web App->>Airflow: Triggers DAG (via API)
+    Airflow->>Nextflow: Runs pipeline with sample ID & path
+    Nextflow->>Storage (S3): Fetches raw data
+    Nextflow->>Nextflow: Processes data (QC, stats, risk analysis)
+    Nextflow->>Storage (S3): Saves results (reports, Z-scores)
+    Nextflow-->>Airflow: Returns exit code
+    alt Pipeline Success
+        Airflow->>Django Web App: Updates status to "Completed"
+        Django Web App->>Database: Stores analysis results
+    else Pipeline Failure
+        Airflow->>Django Web App: Updates status to "Failed"
+    end
+
+    Doctor->>Django Web App: Views Patient Report (risk summary)
+    Bioinformatician->>Django Web App: Views Pipeline Dashboard (QC metrics)
+    Bioinformatician->>Django Web App: Reruns pipeline (adjusts parameters)
+    Bioinformatician->>Django Web App: Accesses Data Explorer (raw counts)
+    Django Web App->>Storage (S3): Fetches technical data for display

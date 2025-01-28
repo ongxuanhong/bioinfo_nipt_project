@@ -1,0 +1,98 @@
+erDiagram
+    Users ||--o{ Samples : "manages"
+    Users {
+        int user_id PK
+        string username
+        string email
+        string password_hash
+        enum role
+        timestamp created_at
+        timestamp updated_at
+        boolean is_active
+    }
+
+    Patients ||--o{ Samples : "provides"
+    Patients {
+        int patient_id PK
+        string first_name
+        string last_name
+        date date_of_birth
+        string medical_record_number
+        enum gender
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PregnancyDetails ||--|| Patients : "has"
+    PregnancyDetails {
+        int pregnancy_id PK
+        int patient_id FK
+        float gestational_age
+        date last_menstrual_period
+        int number_of_fetuses
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Samples ||--o{ WorkflowRuns : "undergoes"
+    Samples {
+        int sample_id PK
+        string barcode
+        int patient_id FK
+        int collected_by FK
+        timestamp collection_date
+        enum sample_type
+        enum sample_status
+        float concentration
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    WorkflowRuns ||--o{ QCMetrics : "generates"
+    WorkflowRuns {
+        int run_id PK
+        int sample_id FK
+        string workflow_version
+        enum run_status
+        json pipeline_parameters
+        timestamp start_time
+        timestamp end_time
+        string error_message
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    QCMetrics {
+        int metric_id PK
+        int run_id FK
+        float total_reads
+        float mapped_reads
+        float duplicate_rate
+        float fetal_fraction
+        boolean passes_qc
+        timestamp created_at
+    }
+
+    Reports ||--|| WorkflowRuns : "produced_from"
+    Reports {
+        int report_id PK
+        int run_id FK
+        int reviewed_by FK
+        enum report_status
+        json analysis_results
+        text clinical_interpretation
+        timestamp generated_at
+        timestamp reviewed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    AuditLogs {
+        int log_id PK
+        int user_id FK
+        string action
+        string entity_type
+        int entity_id
+        json changes
+        timestamp created_at
+    }

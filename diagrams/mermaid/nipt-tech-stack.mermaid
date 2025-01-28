@@ -1,0 +1,31 @@
+graph TD
+    subgraph Frontend
+        React["React.js"]
+        Redux["Redux"]
+        Chart["Chart.js"]
+    end
+
+    subgraph Backend
+        FastAPI["FastAPI"]
+        PostgreSQL["PostgreSQL"]
+        Redis["Redis"]
+        Celery["Celery"]
+    end
+
+    subgraph Pipeline
+        Nextflow["Nextflow"]
+        Docker["Docker"]
+        BWA["BWA"]
+        GATK["GATK"]
+    end
+
+    subgraph Infrastructure
+        AWS["AWS"]
+        S3["S3"]
+        ECS["ECS"]
+    end
+
+    Frontend --> Backend
+    Backend --> Pipeline
+    Backend --> Infrastructure
+    Pipeline --> Infrastructure

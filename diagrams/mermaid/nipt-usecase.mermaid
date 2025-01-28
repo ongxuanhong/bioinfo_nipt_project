@@ -1,0 +1,43 @@
+graph TD
+    subgraph Actors
+        Lab["Lab Technician"]
+        Doc["Doctor"]
+        Admin["Administrator"]
+    end
+
+    subgraph Use Cases
+        Auth["Authentication"]
+        SampleMgmt["Sample Management"]
+        WF["Workflow Management"]
+        Results["Results Management"]
+        PatientMgmt["Patient Management"]
+        QC["Quality Control"]
+        SysAdmin["System Administration"]
+        
+        SampleMgmt --> |includes| SampleReg["Sample Registration"]
+        SampleMgmt --> |includes| SampleTrack["Sample Tracking"]
+        
+        WF --> |includes| PipelineExec["Execute Pipeline"]
+        WF --> |includes| MonitorJobs["Monitor Jobs"]
+        
+        Results --> |includes| GenReport["Generate Reports"]
+        Results --> |includes| ViewReport["View Reports"]
+        
+        QC --> |includes| QCMetrics["Monitor QC Metrics"]
+        QC --> |includes| Validation["Validate Runs"]
+        
+        SysAdmin --> |includes| UserMgmt["User Management"]
+        SysAdmin --> |includes| Config["System Configuration"]
+    end
+
+    Lab --> Auth
+    Lab --> SampleMgmt
+    Lab --> WF
+    Lab --> QC
+    
+    Doc --> Auth
+    Doc --> Results
+    Doc --> PatientMgmt
+    
+    Admin --> Auth
+    Admin --> SysAdmin

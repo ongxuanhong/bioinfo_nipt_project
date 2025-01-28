@@ -1,0 +1,41 @@
+graph TD
+    subgraph Frontend
+        React["React.js"]
+        Redux["Redux"]
+        Chart["Chart.js"]
+    end
+
+    subgraph APILayer
+        FastAPI["FastAPI"]
+        Celery["Celery Workers"]
+    end
+
+    subgraph DatabaseLayer
+        PostgreSQL["PostgreSQL"]
+        Redis["Redis Cache"]
+    end
+
+    subgraph WorkflowOrchestration
+        Airflow["Apache Airflow"]
+        AirflowAPI["Airflow REST API"]
+        AirflowDB["Airflow MetaDB"]
+    end
+
+    subgraph PipelineExecution
+        Nextflow["Nextflow"]
+        BWA["BWA"]
+        GATK["GATK"]
+        FastP["FastP"]
+    end
+
+    subgraph Storage
+        S3["AWS S3"]
+        EFS["AWS EFS"]
+    end
+
+    Frontend --> APILayer
+    APILayer --> DatabaseLayer
+    APILayer --> WorkflowOrchestration
+    WorkflowOrchestration --> PipelineExecution
+    PipelineExecution --> Storage
+    WorkflowOrchestration --> Storage

@@ -1,0 +1,95 @@
+erDiagram
+    Users ||--o{ WorkflowRequests : "initiates"
+    Users {
+        int user_id PK
+        string username
+        string email
+        string password_hash
+        enum role
+        timestamp created_at
+        timestamp updated_at
+        boolean is_active
+    }
+
+    Patients ||--o{ WorkflowRequests : "associated_with"
+    Patients {
+        int patient_id PK
+        string first_name
+        string last_name
+        date date_of_birth
+        string medical_record_number
+        enum gender
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PregnancyDetails ||--|| Patients : "has"
+    PregnancyDetails {
+        int pregnancy_id PK
+        int patient_id FK
+        float gestational_age
+        date last_menstrual_period
+        int number_of_fetuses
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Samples ||--o{ WorkflowRequests : "processed_in"
+    Samples {
+        int sample_id PK
+        string barcode
+        int patient_id FK
+        int collected_by FK
+        timestamp collection_date
+        enum sample_type
+        enum sample_status
+        float concentration
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    WorkflowRequests ||--o{ AnalysisResults : "generates"
+    WorkflowRequests {
+        int request_id PK
+        string airflow_dag_run_id FK
+        int sample_id FK
+        int requested_by FK
+        json workflow_params
+        enum request_status
+        timestamp submitted_at
+        timestamp completed_at
+        string error_message
+    }
+
+    AnalysisResults {
+        int result_id PK
+        int request_id FK
+        int reviewed_by FK
+        enum result_status
+        json analysis_data
+        text clinical_interpretation
+        timestamp generated_at
+        timestamp reviewed_at
+    }
+
+    QualityMetrics ||--|| WorkflowRequests : "measures"
+    QualityMetrics {
+        int metric_id PK
+        int request_id FK
+        float total_reads
+        float mapped_reads
+        float duplicate_rate
+        float fetal_fraction
+        boolean passes_qc
+        timestamp created_at
+    }
+
+    AuditLogs {
+        int log_id PK
+        int user_id FK
+        string action
+        string entity_type
+        int entity_id
+        json changes
+        timestamp created_at
+    }
