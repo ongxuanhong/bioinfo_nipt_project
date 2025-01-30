@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIPT Patient Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+  <style>
+    .stats-card {
+      border-left: 4px solid;
+      transition: transform 0.2s;
+    }
+    .stats-card:hover {
+      transform: translateY(-5px);
+    }
+    .stats-card.primary { border-left-color: #0d6efd; }
+    .stats-card.success { border-left-color: #198754; }
+    .stats-card.warning { border-left-color: #ffc107; }
+    .stats-card.danger { border-left-color: #dc3545; }
+    
+    .patient-card {
+      transition: transform 0.2s;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .patient-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .risk-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    .risk-high { background-color: #dc3545; }
+    .risk-medium { background-color: #ffc107; }
+    .risk-low { background-color: #198754; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid mt-4">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <h2><i class='bx bx-clinic'></i> NIPT Patient Dashboard</h2>
+      </div>
+      <div class="col-md-4 text-end">
+        <button class="btn btn-primary">
+          <i class='bx bx-plus'></i> New Patient
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card stats-card primary">
+          <div class="card-body">
+            <h6 class="text-muted">Total Patients</h6>
+            <h3>256</h3>
+            <p class="mb-0"><i class='bx bx-up-arrow-alt'></i> 12% this week</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card success">
+          <div class="card-body">
+            <h6 class="text-muted">Completed Tests</h6>
+            <h3>189</h3>
+            <p class="mb-0">73.8% completion rate</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card warning">
+          <div class="card-body">
+            <h6 class="text-muted">Pending Results</h6>
+            <h3>45</h3>
+            <p class="mb-0">Average wait: 3 days</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card danger">
+          <div class="card-body">
+            <h6 class="text-muted">High Risk Cases</h6>
+            <h3>12</h3>
+            <p class="mb-0">Requires immediate attention</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="input-group">
+              <span class="input-group-text"><i class='bx bx-search'></i></span>
+              <input type="text" class="form-control" placeholder="Search patients...">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select">
+              <option>All Statuses</option>
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>Completed</option>
+              <option>Failed QC</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select">
+              <option>Risk Level</option>
+              <option>High Risk</option>
+              <option>Medium Risk</option>
+              <option>Low Risk</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select">
+              <option>Gestational Age</option>
+              <option>9-11 weeks</option>
+              <option>12-14 weeks</option>
+              <option>15+ weeks</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <div class="input-group">
+              <input type="date" class="form-control">
+              <button class="btn btn-outline-secondary">
+                <i class='bx bx-filter'></i> Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Cards -->
+    <div class="row">
+      <!-- Patient 1 -->
+      <div class="col-md-4 mb-3">
+        <div class="card patient-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">Jane Doe</h5>
+              <span class="badge bg-success">Completed</span>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Patient ID</small>
+                <p class="mb-0">NIPT-2023-001</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Sample ID</small>
+                <p class="mb-0">S001-23</p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Age</small>
+                <p class="mb-0">32 years</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Gestational Age</small>
+                <p class="mb-0">12 weeks</p>
+              </div>
+            </div>
+            <div class="mb-3">
+              <small class="text-muted">Risk Level</small>
+              <p class="mb-0">
+                <span class="risk-indicator risk-low"></span>
+                Low Risk
+              </p>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-primary flex-grow-1">
+                <i class='bx bx-file'></i> View Report
+              </a>
+              <button class="btn btn-outline-secondary">
+                <i class='bx bx-dots-vertical-rounded'></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patient 2 -->
+      <div class="col-md-4 mb-3">
+        <div class="card patient-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">Sarah Smith</h5>
+              <span class="badge bg-warning text-dark">In Progress</span>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Patient ID</small>
+                <p class="mb-0">NIPT-2023-002</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Sample ID</small>
+                <p class="mb-0">S002-23</p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Age</small>
+                <p class="mb-0">28 years</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Gestational Age</small>
+                <p class="mb-0">10 weeks</p>
+              </div>
+            </div>
+            <div class="mb-3">
+              <small class="text-muted">Processing Status</small>
+              <div class="progress" style="height: 5px;">
+                <div class="progress-bar" role="progressbar" style="width: 65%"></div>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-primary flex-grow-1">
+                <i class='bx bx-loader'></i> Track Progress
+              </a>
+              <button class="btn btn-outline-secondary">
+                <i class='bx bx-dots-vertical-rounded'></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patient 3 -->
+      <div class="col-md-4 mb-3">
+        <div class="card patient-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">Emily Johnson</h5>
+              <span class="badge bg-danger">High Risk</span>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Patient ID</small>
+                <p class="mb-0">NIPT-2023-003</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Sample ID</small>
+                <p class="mb-0">S003-23</p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <small class="text-muted">Age</small>
+                <p class="mb-0">35 years</p>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Gestational Age</small>
+                <p class="mb-0">14 weeks</p>
+              </div>
+            </div>
+            <div class="mb-3">
+              <small class="text-muted">Risk Level</small>
+              <p class="mb-0">
+                <span class="risk-indicator risk-high"></span>
+                High Risk - T21
+              </p>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-danger flex-grow-1">
+                <i class='bx bx-file'></i> Urgent Review
+              </a>
+              <button class="btn btn-outline-secondary">
+                <i class='bx bx-dots-vertical-rounded'></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item disabled">
+          <a class="page-link" href="#"><i class='bx bx-chevron-left'></i></a>
+        </li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#"><i class='bx bx-chevron-right'></i></a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

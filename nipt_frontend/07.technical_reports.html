@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIPT Technical Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+    <!-- Plotly.js for interactive charts -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        .metric-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-card.success { border-left-color: #198754; }
+        .metric-card.warning { border-left-color: #ffc107; }
+        .metric-card.danger { border-left-color: #dc3545; }
+        
+        .chart-container {
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .qc-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .qc-pass { background-color: #198754; }
+        .qc-warn { background-color: #ffc107; }
+        .qc-fail { background-color: #dc3545; }
+
+        .technical-details {
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">NIPT Technical Reports</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Technical Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">QC Metrics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pipeline Logs</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Report Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2>Technical Report Details</h2>
+                <p class="text-muted">Sample ID: NIPT-2023-001 | Run Date: 2023-06-15</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-primary me-2">
+                    <i class='bx bx-download'></i> Export Report
+                </button>
+                <button class="btn btn-outline-secondary">
+                    <i class='bx bx-cog'></i> Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card success">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Reads</h6>
+                        <h3>25.6M</h3>
+                        <p class="mb-0">Passing QC: 98.5%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card success">
+                    <div class="card-body">
+                        <h6 class="text-muted">Mapping Rate</h6>
+                        <h3>99.2%</h3>
+                        <p class="mb-0">Unique: 85.3%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card warning">
+                    <div class="card-body">
+                        <h6 class="text-muted">GC Content</h6>
+                        <h3>42.5%</h3>
+                        <p class="mb-0">Bias: 0.98</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card success">
+                    <div class="card-body">
+                        <h6 class="text-muted">Coverage</h6>
+                        <h3>32.4x</h3>
+                        <p class="mb-0">Uniformity: 0.95</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Left Column - Charts and Visualizations -->
+            <div class="col-md-8">
+                <!-- Coverage Plot -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Genome Coverage Distribution</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary">Linear</button>
+                            <button class="btn btn-sm btn-outline-secondary">Log</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="coveragePlot" class="chart-container"></div>
+                    </div>
+                </div>
+
+                <!-- GC Bias Plot -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">GC Bias Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="gcBiasPlot" class="chart-container"></div>
+                    </div>
+                </div>
+
+                <!-- Z-Score Analysis -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Chromosome Z-Score Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="zScorePlot" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Technical Details and QC -->
+            <div class="col-md-4">
+                <!-- QC Summary -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">QC Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="qc-indicator qc-pass"></span>
+                            <strong>Read Quality:</strong> Pass
+                            <div class="progress mt-2" style="height: 5px;">
+                                <div class="progress-bar bg-success" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="qc-indicator qc-warn"></span>
+                            <strong>Duplication Rate:</strong> Warning
+                            <div class="progress mt-2" style="height: 5px;">
+                                <div class="progress-bar bg-warning" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="qc-indicator qc-pass"></span>
+                            <strong>Coverage Uniformity:</strong> Pass
+                            <div class="progress mt-2" style="height: 5px;">
+                                <div class="progress-bar bg-success" style="width: 92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Details -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Technical Details</h5>
+                    </div>
+                    <div class="card-body technical-details">
+                        <p><strong>Pipeline Version:</strong> v2.1.3</p>
+                        <p><strong>Reference Genome:</strong> hg38</p>
+                        <p><strong>Alignment Tool:</strong> BWA-MEM v0.7.17</p>
+                        <p><strong>Variant Caller:</strong> FreeBayes v1.3.5</p>
+                        <hr>
+                        <h6>Parameters:</h6>
+                        <pre class="bg-light p-2">
+mapq_threshold: 30
+gc_bias_correction: true
+bin_size: 50000
+z_score_method: robust
+reference_set: n=100
+        </pre>
+                    </div>
+                </div>
+
+                <!-- Analysis Flags -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Analysis Flags</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class='bx bx-error'></i>
+                            High duplication rate detected
+                        </div>
+                        <div class="alert alert-info">
+                            <i class='bx bx-info-circle'></i>
+                            GC bias correction applied
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Metrics Table -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Detailed Metrics</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped" id="metricsTable">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                            <th>Threshold</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mean Read Length</td>
+                            <td>151 bp</td>
+                            <td>>100 bp</td>
+                            <td><span class="badge bg-success">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td>Mean Base Quality</td>
+                            <td>35.2</td>
+                            <td>>30</td>
+                            <td><span class="badge bg-success">Pass</span></td>
+                        </tr>
+                        <tr>
+                            <td>Duplication Rate</td>
+                            <td>15.2%</td>
+                            <td><15%</td>
+                            <td><span class="badge bg-warning">Warning</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Plotly.js charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Coverage Plot
+            const coverageData = [{
+                x: Array.from({length: 100}, (_, i) => i),
+                y: Array.from({length: 100}, () => Math.random() * 100),
+                type: 'scatter',
+                name: 'Coverage'
+            }];
+
+            Plotly.newPlot('coveragePlot', coverageData, {
+                title: 'Genome Coverage Distribution',
+                xaxis: { title: 'Genome Position (Mb)' },
+                yaxis: { title: 'Coverage Depth' }
+            });
+
+            // GC Bias Plot
+            const gcData = [{
+                x: Array.from({length: 100}, (_, i) => i),
+                y: Array.from({length: 100}, () => Math.random() * 2),
+                type: 'scatter',
+                name: 'GC Bias'
+            }];
+
+            Plotly.newPlot('gcBiasPlot', gcData, {
+                title: 'GC Bias Analysis',
+                xaxis: { title: 'GC Content (%)' },
+                yaxis: { title: 'Normalized Coverage' }
+            });
+
+            // Z-Score Plot
+            const zScoreData = [{
+                x: ['Chr13', 'Chr18', 'Chr21', 'ChrX'],
+                y: [-0.5, 0.8, 1.2, -0.3],
+                type: 'bar',
+                name: 'Z-Score'
+            }];
+
+            Plotly.newPlot('zScorePlot', zScoreData, {
+                title: 'Chromosome Z-Scores',
+                xaxis: { title: 'Chromosome' },
+                yaxis: { title: 'Z-Score' }
+            });
+        });
+
+        // Initialize DataTables
+        $(document).ready(function() {
+            $('#metricsTable').DataTable({
+                pageLength: 10,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf']
+            });
+        });
+    </script>
+</body>
+</html>
