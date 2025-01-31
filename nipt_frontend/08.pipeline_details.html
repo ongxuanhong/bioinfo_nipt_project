@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIPT Pipeline Runs Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet">
+    <!-- Gantt Chart -->
+    <link href="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css" rel="stylesheet">
+    <style>
+        .pipeline-stage {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .stage-running {
+            background-color: #e3f2fd;
+            border-left: 4px solid #0d6efd;
+        }
+        
+        .stage-completed {
+            background-color: #e8f5e9;
+            border-left: 4px solid #198754;
+        }
+        
+        .stage-failed {
+            background-color: #ffebee;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .stage-pending {
+            background-color: #fff3e0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .resource-meter {
+            height: 4px;
+            border-radius: 2px;
+            background-color: #e9ecef;
+            margin-top: 5px;
+        }
+
+        .log-viewer {
+            background: #1e1e1e;
+            color: #ffffff;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 4px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-error { color: #ff6b6b; }
+        .log-warning { color: #ffd93d; }
+        .log-info { color: #4dabf7; }
+        .log-success { color: #69db7c; }
+
+        .gantt-container {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">NIPT Pipeline Monitor</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Pipeline Runs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Queue Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Resource Monitor</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Run Overview -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2>Pipeline Run Details</h2>
+                <p class="text-muted">Run ID: NIPT-RUN-2023-001 | Started: 2023-06-15 09:30:00</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-danger me-2">
+                    <i class='bx bx-stop-circle'></i> Stop Run
+                </button>
+                <button class="btn btn-outline-secondary">
+                    <i class='bx bx-refresh'></i> Restart Stage
+                </button>
+            </div>
+        </div>
+
+        <!-- Pipeline Progress -->
+        <div class="row">
+            <!-- Left Column - Pipeline Stages -->
+            <div class="col-md-8">
+                <!-- Pipeline Timeline -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pipeline Timeline</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="pipelineGantt" class="gantt-container"></div>
+                    </div>
+                </div>
+
+                <!-- Stage Details -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Stage Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Quality Control Stage -->
+                        <div class="pipeline-stage stage-completed">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Quality Control</h6>
+                                    <small class="text-muted">Duration: 15m 30s</small>
+                                </div>
+                                <span class="badge bg-success">Completed</span>
+                            </div>
+                            <div class="resource-meter">
+                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Alignment Stage -->
+                        <div class="pipeline-stage stage-running">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">BWA Alignment</h6>
+                                    <small class="text-muted">Running: 45m 12s</small>
+                                </div>
+                                <span class="badge bg-primary">Running</span>
+                            </div>
+                            <div class="progress mt-2" style="height: 5px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     style="width: 65%"></div>
+                            </div>
+                            <div class="mt-2">
+                                <small>Processing read group 3 of 5</small>
+                            </div>
+                        </div>
+
+                        <!-- Variant Calling Stage -->
+                        <div class="pipeline-stage stage-pending">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Variant Calling</h6>
+                                    <small class="text-muted">Estimated time: 1h 30m</small>
+                                </div>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log Viewer -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Pipeline Logs</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class='bx bx-download'></i> Download
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary">
+                                <i class='bx bx-refresh'></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="log-viewer">
+                            <div class="log-info">[2023-06-15 09:30:00] Starting pipeline run NIPT-RUN-2023-001</div>
+                            <div class="log-success">[2023-06-15 09:35:30] Quality control completed successfully</div>
+                            <div class="log-info">[2023-06-15 09:35:35] Starting BWA alignment</div>
+                            <div class="log-warning">[2023-06-15 09:45:22] High memory usage detected</div>
+                            <div class="log-info">[2023-06-15 10:15:45] Processing read group 3/5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Resources and Stats -->
+            <div class="col-md-4">
+                <!-- Run Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Run Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="fw-bold">Sample ID</label>
+                            <p class="mb-0">NIPT-S001-2023</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Pipeline Version</label>
+                            <p class="mb-0">v2.1.3</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Priority Level</label>
+                            <p class="mb-0">High</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Estimated Completion</label>
+                            <p class="mb-0">2023-06-15 12:30:00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resource Usage -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Resource Usage</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label>CPU Usage</label>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 75%">75%</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Memory Usage</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 60%">
+                                    12GB/20GB
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Disk I/O</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 45%">
+                                    45MB/s
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stage Parameters -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Current Stage Parameters</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre class="bg-light p-2">
+{
+    "threads": 8,
+    "memory": "12G",
+    "algorithm": "mem",
+    "min_mapq": 30,
+    "max_insert": 500
+}
+                        </pre>
+                    </div>
+                </div>
+
+                <!-- Error Summary -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Error Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class='bx bx-error'></i>
+                            1 warning detected
+                        </div>
+                        <ul class="list-unstyled">
+                            <li class="text-warning">
+                                <i class='bx bx-error'></i>
+                                High memory usage warning at 09:45:22
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js"></script>
+    <script>
+        // Initialize Gantt Chart
+        gantt.init("pipelineGantt");
+        
+        const tasks = {
+            data: [
+                { id: 1, text: "Quality Control", start_date: "2023-06-15 09:30", 
+                  duration: 15, progress: 1 },
+                { id: 2, text: "BWA Alignment", start_date: "2023-06-15 09:45", 
+                  duration: 90, progress: 0.65 },
+                { id: 3, text: "Variant Calling", start_date: "2023-06-15 11:15", 
+                  duration: 120, progress: 0 }
+            ]
+        };
+        
+        gantt.parse(tasks);
+
+        // Real-time updates
+        function updateProgress() {
+            // Implementation for progress updates
+        }
+
+        // Resource monitoring
+        function monitorResources() {
+            // Implementation for resource monitoring
+        }
+
+        // Log updates
+        function updateLogs() {
+            // Implementation for log updates
+        }
+    </script>
+</body>
+</html>
